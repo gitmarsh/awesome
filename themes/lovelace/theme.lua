@@ -71,13 +71,13 @@ theme.border_radius = dpi(6)
 -- Titlebars
 -- (Titlebar items can be customized in titlebars.lua)
 theme.titlebars_enabled = true
-theme.titlebar_size = dpi(35)
+theme.titlebar_size = dpi(30)
 theme.titlebar_title_enabled = false
 theme.titlebar_font = theme.font
 -- Window title alignment: left, right, center
 theme.titlebar_title_align = "center"
 -- Titlebar position: top, bottom, left, right
-theme.titlebar_position = "top"
+theme.titlebar_position = "left"
 theme.titlebar_bg = x.color16
 -- theme.titlebar_bg_focus = x.color5
 -- theme.titlebar_bg_normal = x.color13
@@ -159,8 +159,8 @@ theme.prefix_fg = x.color8
 --theme.taglist_bg_focus = "#ff0000"
 
  --Tasklist
-theme.tasklist_disable_icon = true
-theme.tasklist_plain_task_name = true
+theme.tasklist_disable_icon = false
+theme.tasklist_plain_task_name = false
 theme.tasklist_bg_focus = x.color0 .. "00"
 theme.tasklist_fg_focus = focused_color
 theme.tasklist_bg_normal = x.color0 .. "00"

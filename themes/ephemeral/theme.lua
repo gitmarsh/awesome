@@ -24,6 +24,7 @@ theme.wallpaper_lock = os.getenv("HOME") .. "/.config/awesome/themes/" .. theme_
 -- Set the theme font. This is the font that will be used by default in menus, bars, titlebars etc.
 -- theme.font          = "sans 11"
 theme.font          = "monospace 11"
+theme.font_name     = "ubuntu mono 11"
 
 -- This is how to get other .Xresources values (beyond colors 0-15, or custom variables)
 -- local cool_color = awesome.xrdb_get_value("", "color16")
@@ -33,7 +34,8 @@ theme.bg_normal     = x.color0
 theme.bg_focus      = x.color8
 theme.bg_urgent     = x.color8
 theme.bg_minimize   = x.color8
-theme.bg_systray    = x.color8
+theme.bg_systray    = "#0000000"
+theme.systray_icon_spacing = "3"
 
 theme.fg_normal     = x.color8
 theme.fg_focus      = x.color4
@@ -57,14 +59,14 @@ theme.border_radius = dpi(6)
 -- Titlebars
 -- (Titlebar items can be customized in titlebars.lua)
 theme.titlebars_enabled = true
-theme.titlebar_size = dpi(32)
+theme.titlebar_size = dpi(24)
 theme.titlebar_title_enabled = false
 theme.titlebar_font = "sans bold 9"
 -- Window title alignment: left, right, center
 theme.titlebar_title_align = "center"
 -- Titlebar position: top, bottom, left, right
 theme.titlebar_position = "top"
-theme.titlebar_bg = x.color0
+theme.titlebar_bg = x.color8 .. "88"
 -- theme.titlebar_bg = x.background
 -- theme.titlebar_bg_focus = x.color12
 -- theme.titlebar_bg_normal = x.color8
@@ -149,10 +151,16 @@ theme.prefix_fg = x.color8
  --hotkeys_[bg|fg|border_width|border_color|shape|opacity|modifiers_fg|label_bg|label_fg|group_margin|font|description_font]
  --Example:
 --theme.taglist_bg_focus = "#ff0000"
+theme.hotkeys_bg = "#11000FF"
+theme.hotkeys_fg = "#32f0ef"
+theme.hotkeys_label_fg = x.color9
+theme.hotkeys_border_color = x.color3A
+
+
 
  --Tasklist
 theme.tasklist_font = "sans medium 8"
-theme.tasklist_disable_icon = true
+theme.tasklist_disable_task_name = true
 theme.tasklist_plain_task_name = true
 theme.tasklist_bg_focus = x.color0
 theme.tasklist_fg_focus = x.foreground
@@ -250,19 +258,22 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
 )
 
 -- Variables set for theming the menu:
-theme.menu_height = dpi(35)
-theme.menu_width  = dpi(180)
-theme.menu_bg_normal = x.color0
-theme.menu_fg_normal= x.color7
-theme.menu_bg_focus = x.color8 .. "55"
-theme.menu_fg_focus= x.color7
-theme.menu_border_width = dpi(0)
-theme.menu_border_color = x.color0
 
 -- You can add as many variables as
 -- you wish and access them by using
 -- beautiful.variable in your rc.lua
 --theme.bg_widget = "#cc0000"
+theme.menu_bg_normal = "#11000FF"
+theme_menu_border_width = dpi(2)
+theme_menu_border_color = "#000000"
+theme.menu_submenu_icon = "/home/marhearn/.config/awesome/themes/ephemeral/icons/arrow.png"
+theme.menu_submenu_icon_width = dpi(12)
+theme.menu_submenu_icon_height = dpi(12)
+theme.menu_font = "Ubuntu bold 12"
+theme.menu_height = dpi(35)
+theme.menu_width  = dpi(200)
+theme.menu_bg_focus = "#0e1f2e"
+theme.menu_fg_normal = "#8C9EFF"
 
 -- Titlebar buttons
 -- Define the images to load

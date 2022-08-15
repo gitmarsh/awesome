@@ -1,0 +1,10 @@
+#!/bin/bash
+var1="$(ls /home/marhearn/.config/awesome | grep autostart)"
+
+
+if [[ "$var1" == "autostart" ]];
+then
+   exit ; 
+else
+    cp ~/.config/awesome/startapps ~/.config/awesome/autostart && chmod +x ~/.config/awesome/autostart ;
+fi

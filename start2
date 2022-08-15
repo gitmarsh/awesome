@@ -1,0 +1,2 @@
+#!/bin/bash
+rm ~/.config/awesome/rc.lua && cp ~/.config/awesome/rc.lua.start ~/.config/awesome/rc.lua

@@ -12,7 +12,7 @@ local create_button = function (symbol, color, bg_color, hover_color)
     local widget = wibox.widget {
         font = "icomoon 14",
         align = "center",
-        id = "text_role",
+        id = "icon_role",
         valign = "center",
         markup = helpers.colorize_text(symbol, color),
         widget = wibox.widget.textbox()
@@ -120,6 +120,7 @@ sandwich:buttons(gears.table.join(
     end)
 ))
 
+
 local tag_colors_empty = { "#00000000", "#00000000", "#00000000", "#00000000", "#00000000", "#00000000", "#00000000", "#00000000", "#00000000", "#00000000", }
 
 local tag_colors_urgent = {
@@ -160,6 +161,41 @@ local tag_colors_occupied = {
     x.color4.."55",
     x.color6.."55",
 }
+awful.screen.connect_for_each_screen(function(s)
+local mtextclock = wibox.widget {
+ format = '<span color="#3fa6973">%a %b %d, %H:%M</span>',
+ widget = wibox.widget.textclock,
+    font = "ubuntu mono bold 18",
+    align = "center",
+    forced_width = dpi(2100),
+}
+if s == screen.primary then
+    s.mytextclock = wibox.widget {
+    screen = s,
+
+  widget = wibox.container.background,
+--  bg = beautiful.bg_normal,
+  buttons = {
+    awful.button({}, 1, function()
+     awful.spawn("sh /home/marhearn/.config/eww/dashboard/launch.sh")
+    end),
+  },
+  {
+    widget = wibox.container.margin,
+    margins = 1,
+    {
+      widget = wibox.widget.textclock '<span color="#fa6973">%a %b %d %H:%M</span>',
+      font =  "ubuntu mono bold 18",
+      align = "center",
+      forced_width = 1800,--dpi(1920),
+    },
+  },
+}
+
+local email_widget, email_icon = require("pimpwidgets.email-widget.email")
+
+
+
 
 -- Helper function that updates a taglist item
 local update_taglist = function (item, tag, index)
@@ -174,7 +210,7 @@ local update_taglist = function (item, tag, index)
     end
 end
 
-awful.screen.connect_for_each_screen(function(s)
+
     -- Create a taglist for every screen
     s.mytaglist = awful.widget.taglist {
         screen  = s,
@@ -200,38 +236,94 @@ awful.screen.connect_for_each_screen(function(s)
         style    = {
             font = "ubuntu mono",
             bg = x.color8,
+	    disable_icon = false
         },
         layout   = {
-            -- spacing = dpi(10),
-            -- layout  = wibox.layout.fixed.horizontal
-            layout  = wibox.layout.flex.horizontal
+            spacing = dpi(25),
+            spacing_widget = wibox.widget.separator,
+            layout  = wibox.layout.fixed.horizontal
+           -- layout  = wibox.layout.flex.horizontal
         },
         widget_template = {
             {
                 {
-                    id     = 'text_role',
+                    id     = "icon_role",
                     align  = "center",
-                    widget = wibox.widget.textbox,
+		    valign = "center",
+                    widget = wibox.widget.imagebox,
                 },
-                forced_width = dpi(220),
-                left = dpi(15),
+		
+		left = dpi(15),
                 right = dpi(15),
                 -- Add margins to top and bottom in order to force the
                 -- text to be on a single line, if needed. Might need
                 -- to adjust them according to font size.
-                top  = dpi(4),
-                bottom = dpi(4),
+                top  = dpi(2),
+                bottom = dpi(2),
                 widget = wibox.container.margin
             },
-            -- shape = helpers.rrect(dpi(8)),
-            -- border_width = dpi(2),
+         --   shape = helpers.rrect(dpi(20)),
+        --   border_width = dpi(1),
+          --  border_color = x.color6,
             id = "bg_role",
-            -- id = "background_role",
-            -- shape = gears.shape.rounded_bar,
+           --  id = "background_role",
+          --  shape = gears.shape.rounded_bar,
+            widget = wibox.container.background,
+        },
+    }
+        -- Create a system tray widget
+    s.systray = wibox.widget.systray{
+        screen   = s,
+        style    = {
+            bg = "#11000FF",
+            systray_icon_spacing = dpi(45),
+
+        },
+        layout   = {
+            spacing = dpi(45),
+            spacing_widget = wibox.widget.separator,
+            icon_spacing = 3,
+--            layout  = wibox.layout.fixed.horizontal
+           -- layout  = wibox.layout.flex.horizontal
+        },
+        widget_template = {
+            {
+                {
+                    id     = "icon_role",
+                    align  = "center",
+           		    valign = "center",
+                    widget = wibox.widget.imagebox,
+                },
+		
+		left = dpi(45),
+                left = dpi(45),
+                -- Add margins to top and bottom in order to force the
+                -- text to be on a single line, if needed. Might need
+                -- to adjust them according to font size.
+                top  = dpi(2),
+                bottom = dpi(2),
+                widget = wibox.container.margin
+            },
+         --   shape = helpers.rrect(dpi(20)),
+        --   border_width = dpi(1),
+          --  border_color = x.color6,
+            id = "bg_role",
+           --  id = "background_role",
+          --  shape = gears.shape.rounded_bar,
             widget = wibox.container.background,
         },
     }
 
+local ssystray = create_button("s.systray", x.color1, x.color8.."30", x.color8.."50")
+ssystray:buttons(gears.table.join(
+    awful.button({ }, 1, function ()
+        app_drawer_show()
+    end),
+    awful.button({  }, 2, apps.scratchpad),
+    awful.button({  }, 3, function ()
+        tray_toggle()
+    end)
+))
 
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
@@ -253,70 +345,141 @@ awful.screen.connect_for_each_screen(function(s)
     -- For antialiasing
     -- The actual background color is defined in the wibar items
     -- s.mywibox.bg = "#00000000"
-
+--     s.mywibox.bg = "#11000FF"
+ s.mypromptbox = awful.widget.prompt()
     -- s.mywibox.bg = x.color8
     -- s.mywibox.bg = x.foreground
-    -- s.mywibox.bg = x.background.."88"
+    s.mywibox.bg = x.background.."88"
     -- s.mywibox.bg = x.background
-    s.mywibox.bg = x.color0
+    -- s.mywibox.bg = x.color0
+     s.mywibox.opacity = 1
+
+         local function system_tray()
+local mysystray = wibox.widget.systray(){
+    style = {
+    systray_icon_spacing = 10,
+    
+
+             },
+         }
+
+		mysystray.base_size = beautiful.systray_icon_size
+
+		local widget = wibox.widget({
+			widget = wibox.container.constraint,
+			strategy = "max",
+			width = dpi(0),
+			{
+				widget = wibox.container.margin,
+				margins = dpi(10),
+				mysystray,
+			},
+		})
+
+		local system_tray_animation = animation:new({
+			easing = animation.easing.linear,
+			duration = 0.125,
+			update = function(self, pos)
+				widget.width = pos
+			end,
+		})
+
+		local arrow = wbutton.text.state({
+			text_normal_bg = beautiful.accent,
+			normal_bg = beautiful.wibar_bg,
+			font = beautiful.icon_font .. "Round ",
+			size = 18,
+			text = "",
+			on_turn_on = function(self)
+				system_tray_animation:set(400)
+				self:set_text("")
+			end,
+			on_turn_off = function(self)
+				system_tray_animation:set(0)
+				self:set_text("")
+			end,
+		})
+
+		return wibox.widget({
+			layout = wibox.layout.fixed.horizontal,
+			arrow,
+			widget,
+		})
+    end
 
     -- Bar placement
     awful.placement.maximize_horizontally(s.mywibox)
 
+beautiful.systray_icon_spacing = dpi(20)
+beautiful.systray_icon_size = dpi(5)
+beautiful.bg_systray = "#808080"
     -- Wibar items
     -- Add or remove widgets here
-    s.mywibox:setup {
-        sandwich,
-        s.mytasklist,
-        {
+        s.mywibox:setup {
+   s.systray,
+    
+--   mysystray,
+{
+    s.mytasklist,
+	s.mypromptbox,
+	spacing = 10,
+	spacing_widget = wibox.widget.separator,
+	layout = wibox.layout.fixed.horizontal
+},
+ -- .systray,
+    {
+
+           s.mytextclock,
+            sandwich,
             volume,
             microphone,
             music,
             exit,
             layout = wibox.layout.fixed.horizontal
         },
-        -- expand = "none",
+
         layout = wibox.layout.align.horizontal
-    }
+   }
+
+--spacing        = 10,
+--spacing_widget = wibox.widget.separator,
+--layout = wibox.layout.fixed.horizontal,
+--s.mytasklist,
+
+
+--spacing        = 10,
+--spacing_widget = wibox.widget.separator,
+--l:wq
+--ayout = wibox.layout.fixed.horizontal,
+--mytextclock,
+    
+--{
+ --          volume,
+   --         microphone,
+     --       music,
+       --     exit,
+         --   layout = wibox.layout.fixed.horizontal
+        --}
+--}
+
+
 
 
     -- Create the top bar
-    s.mytopwibox = awful.wibar({screen = s, visible = true, ontop = false, type = "dock", position = "bottom", height = dpi(7)})
+    s.mytopwibox = awful.wibar({screen = s, visible = true, ontop = false, type = "dock", position = "top", height = dpi(5)})
     -- Bar placement
     awful.placement.maximize_horizontally(s.mytopwibox)
-    s.mytopwibox.bg = "#00000000"
+    s.mytopwibox.bg = "#111000FF"
 
     s.mytopwibox:setup {
         widget = s.mytaglist,
     }
+    
 
     -- Create a system tray widget
-    s.systray = wibox.widget.systray()
+    -- s.systray = wibox.widget.systray()
 
-    -- Create a wibox that will only show the tray
-    -- Hidden by default. Can be toggled with a keybind.
-    s.traybox = wibox({visible = false, ontop = true, type = "normal"})
-    s.traybox.width = dpi(120)
-    s.traybox.height = beautiful.wibar_height
-    awful.placement.bottom_left(s.traybox, {honor_workarea = true, margins = beautiful.screen_margin * 2})
-    s.traybox.bg = "#00000000"
-    s.traybox:setup {
-        s.systray,
-        bg = beautiful.bg_systray,
-        shape = helpers.rrect(beautiful.border_radius),
-        widget = wibox.container.background()
-    }
 
-    s.traybox:buttons(gears.table.join(
-    -- Middle click - Hide traybox
-    awful.button({ }, 2, function ()
-        s.traybox.visible = false
-    end)
-    ))
-    -- Hide traybox when mouse leaves
-    s.traybox:connect_signal("mouse::leave", function ()
-        s.traybox.visible = false
-    end)
 
     -- Place bar at the bottom and add margins
     -- awful.placement.bottom(s.mywibox, {margins = beautiful.screen_margin * 2})
@@ -325,7 +488,8 @@ awful.screen.connect_for_each_screen(function(s)
     -- s.padding = { bottom = s.padding.bottom + beautiful.screen_margin * 2 }
     -- For "wibox"
     -- s.padding = { bottom = s.mywibox.height + beautiful.screen_margin * 2 }
-
+return
+    end
 end)
 
 -- We have set the wibar(s) to be ontop, but we do not want it to be above fullscreen clients
@@ -349,7 +513,3 @@ function wibars_toggle()
     s.mytopwibox.visible = not s.mytopwibox.visible
 end
 
-function tray_toggle()
-    local s = awful.screen.focused()
-    s.traybox.visible = not s.traybox.visible
-end

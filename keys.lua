@@ -5,13 +5,17 @@ local beautiful = require("beautiful")
 local apps = require("apps")
 local decorations = require("decorations")
 local gmath = require("gears.math")
-
+local hotkeys_popup = require("awful.hotkeys_popup")
+-- Enable hotkeys help widget for VIM and other apps
+-- when client with a matching name is opened:
+require("awful.hotkeys_popup.keys")
 local helpers = require("helpers")
-
+local switcher = require("awesome-switcher")
 local keys = {}
 local browser  = "firefox"
 local sound_settings = "pavucontrol"
 local mytable       = awful.util.table or gears.table
+require("module.scrcpy")
 -- Mod keys
 superkey = "Mod4"
 altkey = "Mod1"
@@ -67,11 +71,11 @@ keys.desktopbuttons = gears.table.join(
 
     -- Right click - Show app drawer
     -- awful.button({ }, 3, function () mymainmenu:toggle() end),
-    awful.button({ }, 3, function ()
-        if app_drawer_show then
-            app_drawer_show()
-        end
-    end),
+    awful.button({ }, 3,
+    function()
+          awful.spawn("sh /home/marhearn/.config/jgmenu/menu")
+        end),
+ 
 
     -- Middle button - Toggle dashboard
     awful.button({ }, 2, function ()
@@ -106,7 +110,8 @@ keys.desktopbuttons = gears.table.join(
 
 -- {{{ Key bindings
 keys.globalkeys = gears.table.join(
-    
+    awful.key({ superkey, ctrlkey          }, "h",      hotkeys_popup.show_help,
+              {description="show help", group="awesome"}),
     awful.key({ ctrlkey, "Shift" }, "grave",
      function (c)
          move_to_previous_tag()
@@ -118,6 +123,39 @@ keys.globalkeys = gears.table.join(
          end,
         {description = "move cliet to next tag", group = "tag"}),
     -- Focus client by direction (hjkl keys)
+    awful.key({ altkey, ctrlkey }, "1", function()
+       awful.spawn("awstheme 1")
+    end, { description = "change theme 1", group = "app" }),
+    awful.key({ altkey, ctrlkey }, "2", function()
+       awful.spawn("awstheme 2")
+    end, { description = "change theme 2", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "2", function()
+       awful.spawn("awstheme 3")
+    awful.key({}, "Play/Pause media playback", function()
+        awful.spawn("kitty")
+    end)
+    end, { description = "change theme 3", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "3", function()
+       awful.spawn("awstheme 4")
+    end, { description = "change theme 4", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "4", function()
+       awful.spawn("awstheme 5")
+    end, { description = "change theme 5", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "5", function()
+       awful.spawn("awstheme 6")
+    end, { description = "change theme 6", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "7", function()
+       awful.spawn("awstheme 7")
+    end, { description = "change theme 8", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "8", function()
+       awful.spawn("awstheme 8")
+    end, { description = "change theme 9", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "9", function()
+       awful.spawn("awstheme 9")
+    end, { description = "change theme 0", group = " app" }),
+    awful.key({ altkey, ctrlkey }, "0", function()
+       awful.spawn("awstheme 0")
+    end, { description = "change theme 0", group = " app" }),
     awful.key({ superkey }, "j",
         function()
             awful.client.focus.bydirection("down")
@@ -160,15 +198,29 @@ keys.globalkeys = gears.table.join(
             awful.client.focus.bydirection("right")
         end,
         {description = "focus right", group = "client"}),
-    awful.key({ superkey, altkey }, "Up",	function (c) c:move_to_screen()	end,
+    awful.key({ superkey, altkey }, "Up",
+        function (c) c:move_to_screen()
+        end,
     	{description = "move to screen", group = "client"}),
+    awful.key({ superkey }, "Caps_Lock",
+        function()
+            awful.client.focus.bydirection("right")
+        end,
+        {description = "focus right", group = "client"}),
 
     -- Window switcher
-    awful.key({ altkey }, "Tab",
-        function ()
-            window_switcher_show(awful.screen.focused())
-        end,
-        {description = "activate window switcher", group = "client"}),
+    awful.key({ "Mod1",           }, "Tab",
+      function ()
+          switcher.switch( 1, "Mod1", "Alt_L", "Shift", "Tab")
+      end),
+    
+    awful.key({ "Mod1", "Shift"   }, "Tab",
+      function ()
+          switcher.switch(-1, "Mod1", "Alt_L", "Shift", "Tab")
+      end),
+    -- Hot Keys
+   awful.key({ superkey, shiftkey  }, "grave",      hotkeys_popup.show_help,
+             {description="show help", group="awesome"}),
 
     -- Focus client by index (cycle through clients)
     awful.key({ superkey }, "z",
@@ -257,10 +309,12 @@ keys.globalkeys = gears.table.join(
 
     awful.key({ superkey,           }, "x",
         function ()
-            awful.tag.history.restore()
+            awful.spawn("zoomx")
         end,
         {description = "go back", group = "tag"}),
 
+    awful.key({ superkey }, "Return", function () awful.spawn(user.terminal) end,
+        {description = "open a terminal", group = "launcher"}),
     -- Spawn terminal
     awful.key({ superkey }, "grave", function () awful.spawn(user.terminal) end,
         {description = "open a terminal", group = "launcher"}),
@@ -275,13 +329,16 @@ keys.globalkeys = gears.table.join(
 
     -- Reload Awesome
     awful.key({ superkey, shiftkey }, "r", awesome.restart,
-        {description = "reload awesome", group = "awesome"}),
+    {description = "reload awesome", group = "awesome"}),
+
+    awful.key({}, "F12", nil, function () awful.spawn("tdrop -r scrcpy") end),
+-- -w 280 -y 200 -h 1225 -x 20  scrcpy") end),
 
     -- Quit Awesome
     -- Logout, Shutdown, Restart, Suspend, Lock
-    awful.key({ superkey, shiftkey }, "x",
+    awful.key({ superkey, ctrlkey }, "x",
         function ()
-            exit_screen_show()
+          awful.spawn.with_shell("chwp")
         end,
         {description = "quit awesome", group = "awesome"}),
     awful.key({ superkey, shiftkey }, "q",
@@ -356,13 +413,14 @@ keys.globalkeys = gears.table.join(
         {description = "restore minimized", group = "client"}),
 
     -- Prompt
-    --awful.key({ superkey },            "d",     function () awful.screen.focused().mypromptbox:run() end,
-    --{description = "run prompt", group = "launcher"}),
+    awful.key({ superkey }, "r",     function () awful.screen.focused().mypromptbox:run() end,
+    {description = "run prompt", group = "launcher"}),
     -- Run program (d for dmenu ;)
     awful.key({ superkey }, "d",
         function()
-            awful.spawn.with_shell("rofi -matching fuzzy -show combi")
-        end,
+           awful.spawn.with_shell("rofi -no-lazy-grab -show drun -modi drun,run,window") -- -theme '/home/marhearn/.config/rofi/launchers/misc/row.rasi'")
+        
+	end,
         {description = "rofi launcher", group = "launcher"}),
 
     -- Run
@@ -378,11 +436,12 @@ keys.globalkeys = gears.table.join(
     awful.key({ superkey }, "g",
         function ()
             -- Not all sidebars have a prompt
-            if sidebar_activate_prompt then
-                sidebar_activate_prompt("web_search")
-            end
+           -- if sidebar_activate_prompt then
+          --      sidebar_activate_prompt("web_search")
+          --  end
+            awful.spawn("chrome")
         end,
-        {description = "activate sidebar web search prompt", group = "awesome"}),
+        {description = "Chrome Browser", group = "launcher"}),
 
     -- Dismiss notifications and elements that connect to the dismiss signal
     awful.key( { ctrlkey }, "space",
@@ -497,8 +556,8 @@ keys.globalkeys = gears.table.join(
         {description = "send STOP signal to all firefox processes", group = "other"}),
     awful.key({ superkey, shiftkey }, "F7", function() awful.spawn.with_shell("freeze -u firefox") end,
         {description = "send CONT signal to all firefox processes", group = "other"}),
-    awful.key({ superkey }, "q", function() apps.scratchpad() end,
-        {description = "scratchpad", group = "launcher"}),
+--    awful.key({ superkey }, "q", function() apps.scratchpad() end,
+ --       {description = "scratchpad", group = "launcher"}),
     -- Max layout
     -- Single tap: Set max layout
     -- Double tap: Also disable floating for ALL visible clients in the tag
@@ -537,12 +596,13 @@ keys.globalkeys = gears.table.join(
                                            end,
         {description = "set floating layout", group = "tag"}),
     -- Dashboard
-    awful.key({ superkey }, "Return", function()
-        if dashboard_show then
-            dashboard_show()
-        end
+    awful.key({ ctrlkey }, "Return", function()
+    awful.spawn("sh /home/marhearn/.config/eww/dashboard/launch.sh")
+    end
+    ),
+
         -- rofi_show()
-    end, {description = "dashboard", group = "custom"}),
+
 
     -- App drawer
     awful.key({ superkey }, "a", function()
@@ -578,10 +638,10 @@ keys.globalkeys = gears.table.join(
     awful.key({ superkey, shiftkey }, "F4", function() awful.spawn(user.terminal .. " -e 'ncmpcpp -c ~/.config/ncmpcpp/config_visualizer -s visualizer'") end,
         {description = "ncmpcpp", group = "launcher"}),
     -- Network dialog: nmapplet rofi frontend
-    awful.key({ superkey, altkey }, "n", function() awful.spawn("networks-rofi") end,
+    awful.key({ superkey, altkey }, "n", function() awful.spawn("sh ~/.config/rofi/launchers/ribbon/launcher.sh") end,
         {description = "spawn network dialog", group = "launcher"}),
     -- Toggle sidebar
-    awful.key({ altkey }, "grave", function() sidebar_toggle() end,
+    awful.key({ altkey }, "grave", function() awful.spawn("/home/marhearn/scrcpy_toggle") end,
         {description = "show or hide sidebar", group = "awesome"}),
     -- Toggle wibar(s)
     awful.key({ superkey }, "b", function() wibars_toggle() end,
@@ -617,9 +677,28 @@ keys.globalkeys = gears.table.join(
         awful.spawn(sound_settings) end,
         {description = "sound settings", group = "launcher"}),
     -- Launch Browser
+    awful.key({ ctrlkey, altkey}, "h", function()
+			hotkeys_popup.show_help()
+		end),
     awful.key({ superkey }, "w", function ()
         awful.spawn(browser)  end,
         {description = "run browser", group = "client"}
+    ),
+    awful.key({ superkey, altkey }, "j", function ()
+	    awful.spawn("jellyfinmediaplayer") end,
+	    {description = "open jellyfin media player", group = "launcher"}),
+    awful.key({ superkey, altkey }, "v", function()
+        awful.spawn("vlc") end,
+        {description = "video player", group = "launcher"}
+    ),
+    awful.key({ superkey,  }, "F4", function()
+        awful.spawn("kitty -e mc")
+    end,
+    {description = "terminal file manager", group = "launcher"}
+    ),
+    awful.key({ superkey, altkey }, "k", function ()
+	    awful.spawn("gwenview") end,
+    {description = "open gwenview", group = "launcher"}
     )
 )
 
@@ -736,6 +815,8 @@ keys.clientkeys = gears.table.join(
         end,
         {description = "normal mode", group = "client"}),
 
+    awful.key({ superkey   }, "q",      function (c) c:kill() end,
+        {description = "close", group = "client"}),
     -- Close client
     awful.key({ superkey   }, "Escape",      function (c) c:kill() end,
         {description = "close", group = "client"}),

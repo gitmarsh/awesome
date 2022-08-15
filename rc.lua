@@ -1,25 +1,13 @@
---[[
-   ___       ___       ___       ___       ___       ___       ___
-  /\  \     /\__\     /\  \     /\  \     /\  \     /\__\     /\  \
- /::\  \   /:/\__\   /::\  \   /::\  \   /::\  \   /::L_L_   /::\  \
-/::\:\__\ /:/:/\__\ /::\:\__\ /\:\:\__\ /:/\:\__\ /:/L:\__\ /::\:\__\
-\/\::/  / \::/:/  / \:\:\/  / \:\:\/__/ \:\/:/  / \/_/:/  / \:\:\/  /
-  /:/  /   \::/  /   \:\/  /   \::/  /   \::/  /    /:/  /   \:\/  /
-  \/__/     \/__/     \/__/     \/__/     \/__/     \/__/     \/__/
-
--- >> The file that binds everything together.
---]]
-
-
 local themes = {
     "manta",        -- 1 --
     "lovelace",     -- 2 --
     "skyfall",      -- 3 --
     "ephemeral",    -- 4 --
     "amarena",      -- 5 --
+    "night",        -- 6 --
 }
 -- Change this number to use a different theme
-local theme = themes[2]
+local theme = themes[4]
 -- ===================================================================
 -- Affects the window appearance: titlebar, titlebar buttons...
 local decoration_themes = {
@@ -27,7 +15,7 @@ local decoration_themes = {
     "skyfall",        -- 2 -- No buttons, only title
     "ephemeral",      -- 3 -- Text-generated titlebar buttons
 }
-local decoration_theme = decoration_themes[1]
+local decoration_theme = decoration_themes[2]
 -- ===================================================================
 -- Statusbar themes. Multiple bars can be declared in each theme.
 local bar_themes = {
@@ -36,6 +24,8 @@ local bar_themes = {
     "skyfall",      -- 3 -- Weather, taglist, window buttons, pop-up tray
     "ephemeral",    -- 4 -- Taglist, start button, tasklist, and more buttons
     "amarena",      -- 5 -- Minimal taglist and dock with autohide
+    "night",        -- 6 -- Custom bar theme
+    "init",         -- 7 -- init
 }
 local bar_theme = bar_themes[4]
 
@@ -57,8 +47,9 @@ local notification_theme = notification_themes[3]
 local sidebar_themes = {
     "lovelace",       -- 1 -- Uses image icons
     "amarena",        -- 2 -- Text-only (consumes less RAM)
+    "init",           -- 3 -- init
 }
-local sidebar_theme = sidebar_themes[1]
+local sidebar_theme = sidebar_themes[2]
 -- ===================================================================
 local dashboard_themes = {
     "skyfall",        -- 1 --
@@ -71,6 +62,9 @@ local exit_screen_themes = {
     "ephemeral",     -- 2 -- Uses text-generated icons (consumes less RAM)
 }
 local exit_screen_theme = exit_screen_themes[1]
+--require("widgets.vkeyboard")
+--vkeyboard,
+local switcher  = require("awesome-switcher")
 -- ===================================================================
 -- User variables and preferences
 user = {
@@ -79,11 +73,22 @@ user = {
     terminal = "kitty",
     floating_terminal = "kitty",
     browser = "firefox",
-    file_manager = "thunar",
+    file_manager = "dolphin",
     editor = "kitty --class editor -e nvim",
     email_client = "kitty --class email -e neomutt",
     music_client = "kitty -o font_size=12 --class music -e ncspot",
     sound_settings = "pavucontrol",
+    video_client = "vlc",
+    photo_viewer = "gwenview",
+    graphics_settings = "nvidia-settings",
+    display_settings = "arandr",
+    bluetooth_settings = "blueman",
+    network_settings = "kitty -e ip addr",
+    theme_settings = "kvantumm",
+    system_monitor = "kitty -e btop",
+
+
+
 
     -- >> Web Search <<
     web_search_cmd = "xdg-open https://duckduckgo.com/?q=",
@@ -96,7 +101,7 @@ user = {
     dirs = {
         downloads = os.getenv("XDG_DOWNLOAD_DIR") or "~/Downloads",
         documents = os.getenv("XDG_DOCUMENTS_DIR") or "~/Documents",
-        music = os.getenv("XDG_MUSIC_DIR") or "~/Music",
+        server = os.getenv("XDG_MUSIC_DIR") or "/mnt/nfs/truenas",
         pictures = os.getenv("XDG_PICTURES_DIR") or "~/Pictures",
         videos = os.getenv("XDG_VIDEOS_DIR") or "~/Videos",
         -- Make sure the directory exists so that your screenshots
@@ -234,14 +239,15 @@ local decorations = require("decorations")
 decorations.init(decoration_theme)
 -- Load helper functions
 local helpers = require("helpers")
-
+local lain = require("lain")
 -- >> Elements - Desktop components
 -- Statusbar(s)
 require("elemental.bar."..bar_theme)
+require("elemental.bar.".."ephemeral2")
 -- Exit screen
 require("elemental.exit_screen."..exit_screen_theme)
 -- Sidebar
-require("elemental.sidebar."..sidebar_theme)
+--require("elemental.sidebar."..sidebar_theme)
 -- Dashboard (previously called: Start screen)
 require("elemental.dashboard."..dashboard_theme)
 -- Lock screen
@@ -397,7 +403,7 @@ awful.rules.rules = {
             honor_workarea = true,
             honor_padding = true,
             maximized = false,
-            titlebars_enabled = beautiful.titlebars_enabled,
+            titlebars_enabled = beautiful.titlebars_disabled,
             maximized_horizontal = false,
             maximized_vertical = false,
             placement = floating_client_placement
@@ -412,6 +418,7 @@ awful.rules.rules = {
                 "copyq",  -- Includes session name in class.
                 "floating_terminal",
                 "riotclientux.exe",
+                "krunner",
                 "leagueclientux.exe",
                 "Devtools", -- Firefox devtools
             },
@@ -421,9 +428,11 @@ awful.rules.rules = {
                 "Nm-connection-editor",
                 "File-roller",
                 "fst",
+                "scrcpy",
                 "Nvidia-settings",
             },
             name = {
+                "gnome-pie",
                 "Event Tester",  -- xev
                 "MetaMask Notification",
             },
@@ -456,17 +465,12 @@ awful.rules.rules = {
     {
         rule_any = {
             class = {
-                "lt-love",
-                "portal2_linux",
-                "csgo_linux64",
-                "EtG.x86_64",
-                "factorio",
-                "dota2",
-                "Terraria.bin.x86",
-                "dontstarve_steam",
-            },
+                "Gunfire Reborn",
+                "Gunfire Reborn",
+                "jellyfinmediaplayer",
+           },
             instance = {
-                "synthetik.exe",
+                "Gunfire Reborn",
             },
         },
         properties = { fullscreen = true }
@@ -493,9 +497,11 @@ awful.rules.rules = {
             class = {
                 "Steam",
                 "discord",
+                "krunnner",
                 "music",
                 "markdown_input",
                 "scratchpad",
+                "Spotify",
             },
             instance = {
                 "music",
@@ -517,33 +523,42 @@ awful.rules.rules = {
                 "install league of legends (riot client live).exe",
                 "gw2-64.exe",
                 "battle.net.exe",
+                "tabby",
+                "gnome-pie",
                 "riotclientservices.exe",
                 "leagueclientux.exe",
                 "riotclientux.exe",
                 "leagueclient.exe",
                 "^editor$",
-                "markdown_input"
+                "markdown_input",
+                "corekeyboard",
+        "jellyfinmediaplayer",
+        "scrcpy",
+        "krunner",
+        "chrome",
+        "google-chrome",
+        "polybar",
+        "plank"
+
             },
             class = {
-                "qutebrowser",
-                "Sublime_text",
-                "Subl3",
-                --"discord",
-                --"TelegramDesktop",
+                "kitty",
+                "discord",
                 "firefox",
                 "Nightly",
+                "jellyfinmediaplayer",
                 "Steam",
-                "Lutris",
+                "mpv",
                 "Chromium",
                 "^editor$",
                 "markdown_input"
-                -- "Thunderbird",
             },
             type = {
               "splash"
             },
             name = {
-                "^discord.com is sharing your screen.$" -- Discord (running in browser) screen sharing popup
+                "^discord.com is sharing your screen.$", -- Discord (running in browser) screen sharing popup
+                
             }
         },
         callback = function(c)
@@ -622,6 +637,17 @@ awful.rules.rules = {
             awful.placement.bottom(c)
         end
     },
+{
+    rule_any = { name = { "plank" } },
+        properties = {
+            skip_taskbar = true,
+            ontop = false,
+            sticky = true,
+            below = false,
+            focusable = false,
+            titlebars_enabled = false,
+        }
+},
 
     -- File chooser dialog
     {
@@ -647,7 +673,8 @@ awful.rules.rules = {
         rule_any = {
             class = {
                 "Nemo",
-                "Thunar"
+                "Thunar",
+                "Dolphin",
             },
         },
         except_any = {
@@ -739,6 +766,7 @@ awful.rules.rules = {
             class = {
                 "feh",
                 "Sxiv",
+        		"gwenview",
             },
         },
         properties = {
@@ -793,6 +821,7 @@ awful.rules.rules = {
     },
 
     -- MPV
+
     {
         rule = { class = "mpv" },
         properties = {},
@@ -819,6 +848,29 @@ awful.rules.rules = {
             end)
         end
     },
+  {
+rule = { class ={ "scrcpy", "tdrop" },  type = { "above",  }, },
+properties = {},
+callback = function (c)
+if awful.layout.get(awful.screen.focused()) == awful.layout.suit.max then
+c.floating = true
+c.ontop = true
+c.sticky = true
+c.width = dpi(500)
+c.height = dpi(1200)
+awful.placement.bottom_left(c, {
+honor_padding = true,
+honor_workarea = true,
+margins = { bottom = beautiful.useless_gap * 2, right = beautiful.useless_gap * 2}
+})
+end
+c:connect_signal("property::fullscreen", function()
+if not c.fullscreen then
+c.ontop = true
+end
+end)
+end
+},
 
     -- "Fix" games that minimize on focus loss.
     -- Usually this can be fixed by launching them with
@@ -946,10 +998,10 @@ awful.rules.rules = {
     {
         rule_any = {
             class = {
-                "htop",
+                "btop",
             },
             instance = {
-                "htop",
+                "btop",
             },
         },
         properties = { screen = 1, tag = awful.screen.focused().tags[5] }
@@ -1014,9 +1066,9 @@ awful.rules.rules = {
             type = { "dialog" }
         },
         properties = { screen = 1, tag = awful.screen.focused().tags[10] }
-    },
-
+    }
 }
+
 -- (Rules end here) ..................................................
 -- ===================================================================
 
@@ -1160,5 +1212,32 @@ end)
 
 collectgarbage("setpause", 110)
 collectgarbage("setstepmul", 1000)
+-- other imports
 
 
+--beautiful.init("tag_preview.lua")
+--local bling = require("bling")
+require("menu")
+awful.spawn("screenfix")
+awful.spawn("picom --experimental-backends")
+awful.spawn("plank")
+awful.spawn("eww daemon")
+awful.spawn("birdtray")
+awful.spawn("gnome-pie")
+awful.spawn("sh ~/.config/awesome/start")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--require("widgets.vkeyboard")

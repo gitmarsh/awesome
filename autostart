@@ -1,0 +1,9 @@
+#!/bin/bash
+screenfix
+sleep 1
+picom --experimental-backends
+sleep 1
+eww daemon
+sleep 1
+gnome-pie
+exit
